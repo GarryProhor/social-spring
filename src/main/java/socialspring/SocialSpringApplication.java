@@ -23,10 +23,10 @@ public class SocialSpringApplication {
     CommandLineRunner run(RoleRepository roleRepository, UserService userService) {
         return args -> {
             roleRepository.save(new Role(1L, "USER"));
-            ApplicationUser user = new ApplicationUser();
-            user.setFirstName("garry");
-            user.setLastName("prohor");
-            userService.registerUser(user);
+//            ApplicationUser user = new ApplicationUser();
+//            user.setFirstName("garry");
+//            user.setLastName("prohor");
+//            userService.registerUser(user);
         };
     }
 }
