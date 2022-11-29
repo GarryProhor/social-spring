@@ -1,7 +1,8 @@
 package socialspring.service;
 
 import socialspring.model.ApplicationUser;
+import socialspring.model.RegistrationObject;
 
 public interface UserService {
-    ApplicationUser registerUser(ApplicationUser user);
+    ApplicationUser registerUser(RegistrationObject registrationObject);
 }
