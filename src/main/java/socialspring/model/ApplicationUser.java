@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ApplicationUser {
     @Id
@@ -20,10 +20,10 @@ public class ApplicationUser {
     @Column(name = "user_id")
     Long userId;
 
-    @Column(name="first_name")
+    @Column(name = "first_name")
     String firstName;
 
-    @Column(name="last_name")
+    @Column(name = "last_name")
     String lastName;
 
     @Column(unique = true)
@@ -42,12 +42,19 @@ public class ApplicationUser {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role_junction",
-    joinColumns = {@JoinColumn(name = "user_id")},
-    inverseJoinColumns = {@JoinColumn(name = "role_id")}
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id")}
     )
     Set<Role> authorities;
 
+    Boolean enabled;
+
+    @Column(nullable = true)
+    @JsonIgnore
+    Long verification;
+
     public ApplicationUser() {
         this.authorities = new HashSet<>();
+        this.enabled = false;
     }
 }

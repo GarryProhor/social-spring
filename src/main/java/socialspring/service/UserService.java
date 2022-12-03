@@ -9,4 +9,6 @@ public interface UserService {
     ApplicationUser getUserByUsername(String username);
 
     ApplicationUser updateUser(ApplicationUser user);
+
+    void generateEmailVerification(String userName);
 }

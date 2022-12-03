@@ -65,8 +65,22 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public void generateEmailVerification(String userName) {
+        ApplicationUser user = userRepository.findByUserName(userName).orElseThrow(UserDoesNotException::new);
+        
+        user.setVerification(generateVerificationNumber());
+        userRepository.save(user);
+    }
+
+
     private String generateUserName(String name) {
-        long generatedNumber = (long) Math.floor(Math.random() * 1000000000);
+        long generatedNumber = (long) Math.floor(Math.random() * 1000_000_000);
         return name + generatedNumber;
+    }
+
+    private Long generateVerificationNumber() {
+        return (long) Math.floor(Math.random() * 100_000_000);
+
     }
 }
