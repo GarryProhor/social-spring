@@ -3,6 +3,7 @@ package socialspring.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import socialspring.exception.EmailAlreadyTakenException;
+import socialspring.exception.UserDoesNotException;
 import socialspring.model.ApplicationUser;
 import socialspring.model.RegistrationObject;
 import socialspring.model.Role;
@@ -43,6 +44,20 @@ public class UserServiceImpl implements UserService {
         roles.add(roleRepository.findByAuthority("USER").get());
         user.setAuthorities(roles);
 
+        try{
+            return userRepository.save(user);
+        }catch (Exception e){
+            throw new EmailAlreadyTakenException();
+        }
+    }
+
+    @Override
+    public ApplicationUser getUserByUsername(String username) {
+        return userRepository.findByUserName(username).orElseThrow(UserDoesNotException::new);
+    }
+
+    @Override
+    public ApplicationUser updateUser(ApplicationUser user) {
         try{
             return userRepository.save(user);
         }catch (Exception e){
