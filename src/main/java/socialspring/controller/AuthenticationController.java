@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import socialspring.exception.EmailAlreadyTakenException;
+import socialspring.exception.EmailFailedToSendException;
 import socialspring.exception.UserDoesNotException;
 import socialspring.model.ApplicationUser;
 import socialspring.model.RegistrationObject;
@@ -15,7 +16,7 @@ import java.util.LinkedHashMap;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-public class AuthenticationController {
+public class  AuthenticationController {
     private final UserService userService;
 
     @ExceptionHandler({EmailAlreadyTakenException.class})
@@ -45,9 +46,14 @@ public class AuthenticationController {
         return userService.updateUser(user);
     }
 
+    @ExceptionHandler({EmailFailedToSendException.class})
+    public ResponseEntity<String> handleFailedEmail(){
+        return new ResponseEntity<>("Email failed to send, try again in a moment", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @PostMapping("/email/code")
     public ResponseEntity<String> createEmailVerification(@RequestBody LinkedHashMap<String, String> body){
         userService.generateEmailVerification(body.get("userName"));
-        return new ResponseEntity<>("Verification code generated? email sent", HttpStatus.OK);
+        return new ResponseEntity<>("Verification code generated email sent", HttpStatus.OK);
     }
 }

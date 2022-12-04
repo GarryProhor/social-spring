@@ -3,12 +3,14 @@ package socialspring.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import socialspring.exception.EmailAlreadyTakenException;
+import socialspring.exception.EmailFailedToSendException;
 import socialspring.exception.UserDoesNotException;
 import socialspring.model.ApplicationUser;
 import socialspring.model.RegistrationObject;
 import socialspring.model.Role;
 import socialspring.repository.ApplicationUserRepository;
 import socialspring.repository.RoleRepository;
+import socialspring.service.MailService;
 import socialspring.service.UserService;
 
 import java.util.Set;
@@ -18,6 +20,8 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
     private final ApplicationUserRepository userRepository;
     private final RoleRepository roleRepository;
+
+    private final MailService mailService;
 
     @Override
     public ApplicationUser registerUser(RegistrationObject ro) {
@@ -70,6 +74,15 @@ public class UserServiceImpl implements UserService {
         ApplicationUser user = userRepository.findByUserName(userName).orElseThrow(UserDoesNotException::new);
         
         user.setVerification(generateVerificationNumber());
+
+        try {
+            mailService.sendEmail(user.getEmail(),
+                    "Your verification code",
+                    "Here is your verification code" + user.getVerification());
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new EmailFailedToSendException();
+        }
         userRepository.save(user);
     }
 
