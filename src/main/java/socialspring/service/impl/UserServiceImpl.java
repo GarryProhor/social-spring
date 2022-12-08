@@ -1,9 +1,11 @@
 package socialspring.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import socialspring.exception.EmailAlreadyTakenException;
 import socialspring.exception.EmailFailedToSendException;
+import socialspring.exception.IncorrectVerificationCodeException;
 import socialspring.exception.UserDoesNotException;
 import socialspring.model.ApplicationUser;
 import socialspring.model.RegistrationObject;
@@ -22,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
 
     private final MailService mailService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public ApplicationUser registerUser(RegistrationObject ro) {
@@ -78,12 +81,35 @@ public class UserServiceImpl implements UserService {
         try {
             mailService.sendEmail(user.getEmail(),
                     "Your verification code",
-                    "Here is your verification code" + user.getVerification());
+                    "Here is your verification code " + user.getVerification());
             userRepository.save(user);
         } catch (Exception e) {
             throw new EmailFailedToSendException();
         }
         userRepository.save(user);
+    }
+
+    @Override
+    public ApplicationUser verifyEmail(String userName, Long code) {
+        ApplicationUser user = userRepository.findByUserName(userName).orElseThrow(UserDoesNotException::new);
+
+        if (code.equals(user.getVerification())){
+            user.setEnabled(true);
+            user.setVerification(null);
+            return userRepository.save(user);
+        }else {
+            throw new IncorrectVerificationCodeException();
+        }
+    }
+
+    @Override
+    public ApplicationUser setPassword(String userName, String password) {
+        ApplicationUser user = userRepository.findByUserName(userName).orElseThrow(UserDoesNotException::new);
+
+        String encoderPassword = passwordEncoder.encode(password);
+        user.setPassword(encoderPassword);
+
+        return userRepository.save(user);
     }
 
 

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import socialspring.exception.EmailAlreadyTakenException;
 import socialspring.exception.EmailFailedToSendException;
+import socialspring.exception.IncorrectVerificationCodeException;
 import socialspring.exception.UserDoesNotException;
 import socialspring.model.ApplicationUser;
 import socialspring.model.RegistrationObject;
@@ -71,5 +72,35 @@ public class AuthenticationController {
     public ResponseEntity<String> createEmailVerification(@RequestBody LinkedHashMap<String, String> body) {
         userService.generateEmailVerification(body.get("userName"));
         return new ResponseEntity<>("Verification code generated email sent", HttpStatus.OK);
+    }
+
+    @ExceptionHandler({IncorrectVerificationCodeException.class})
+    public ResponseEntity<String> handleVerificationCode(){
+        return new ResponseEntity<>("The code provided does not match the users code", HttpStatus.CONFLICT);
+    }
+    //    POST localhost:8080/auth/email/verify
+//    {
+//        "userName": "abedabed663910176"
+//        "code": "123456879"
+//    }
+    @PostMapping("/email/verify")
+    public ApplicationUser verifyEmail(@RequestBody LinkedHashMap<String, String> body){
+        Long code = Long.parseLong(body.get("code"));
+        String userName = body.get("userName");
+
+        return userService.verifyEmail(userName, code);
+    }
+
+    //    PUT localhost:8080/auth/update/password
+//    {
+//        "userName": "abedabed663910176"
+//        "password": "password"
+//    }
+    @PutMapping("/update/password")
+    public ApplicationUser updatePassword(@RequestBody LinkedHashMap<String, String> body){
+        String userName = body.get("userName");
+        String password = body.get("password");
+
+        return userService.setPassword(userName, password);
     }
 }

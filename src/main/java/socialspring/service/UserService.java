@@ -11,4 +11,7 @@ public interface UserService {
     ApplicationUser updateUser(ApplicationUser user);
 
     void generateEmailVerification(String userName);
+
+    ApplicationUser verifyEmail(String userName, Long code);
+    ApplicationUser setPassword(String userName, String password);
 }
