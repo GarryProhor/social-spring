@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
+@CrossOrigin("*")
 public class AuthenticationController {
     private final UserService userService;
 
