@@ -32,7 +32,7 @@ public class MailServiceImpl implements MailService {
         MimeMessage email = new MimeMessage(session);
 
         try {
-            email.setFrom(new InternetAddress("igorprohorchenko@gmail.com"));
+            email.setFrom(new InternetAddress("belprofmash.gomel@gmail.com"));
             email.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(toAddress));
             email.setSubject(subject);
             email.setText(content);
