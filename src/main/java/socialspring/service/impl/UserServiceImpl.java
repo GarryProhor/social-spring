@@ -1,6 +1,12 @@
 package socialspring.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import socialspring.exception.EmailAlreadyTakenException;
@@ -16,10 +22,11 @@ import socialspring.service.MailService;
 import socialspring.service.UserService;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
     private final ApplicationUserRepository userRepository;
     private final RoleRepository roleRepository;
 
@@ -121,5 +128,19 @@ public class UserServiceImpl implements UserService {
     private Long generateVerificationNumber() {
         return (long) Math.floor(Math.random() * 100_000_000);
 
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        ApplicationUser u = userRepository.findByUserName(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Set<GrantedAuthority> authorities = u.getAuthorities()
+                .stream()
+                .map(role -> new SimpleGrantedAuthority(role.getAuthority()))
+                .collect(Collectors.toSet());
+
+        UserDetails ud = new User(u.getUserName(), u.getPassword(), authorities);
+        return ud;
     }
 }
