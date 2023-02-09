@@ -3,14 +3,20 @@ package socialspring.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import socialspring.exception.EmailAlreadyTakenException;
 import socialspring.exception.EmailFailedToSendException;
 import socialspring.exception.IncorrectVerificationCodeException;
 import socialspring.exception.UserDoesNotException;
 import socialspring.model.ApplicationUser;
+import socialspring.model.LoginResponse;
 import socialspring.model.RegistrationObject;
 import socialspring.service.UserService;
+import socialspring.service.impl.TokenService;
 
 import java.util.LinkedHashMap;
 
@@ -20,6 +26,8 @@ import java.util.LinkedHashMap;
 @CrossOrigin("*")
 public class AuthenticationController {
     private final UserService userService;
+    private final TokenService tokenService;
+    private final AuthenticationManager authenticationManager;
 
     @ExceptionHandler({EmailAlreadyTakenException.class})
     public ResponseEntity<String> handlerEmailTaken() {
@@ -104,4 +112,21 @@ public class AuthenticationController {
 
         return userService.setPassword(userName, password);
     }
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody LinkedHashMap<String, String> body){
+        String userName = body.get("userName");
+        String password = body.get("password");
+
+        try{
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userName, password)
+            );
+
+            String token = tokenService.generateToken(auth);
+            return new LoginResponse(userService.getUserByUsername(userName), token);
+        }catch (AuthenticationException e){
+            return new LoginResponse(null, "");
+        }
+    }
+
 }
