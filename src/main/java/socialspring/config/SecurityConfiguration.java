@@ -26,12 +26,10 @@ import socialspring.service.UserService;
 public class SecurityConfiguration {
 
     private  final RSAKeyProperties keys;
-    private final UserService userService;
 
     @Autowired
-    public SecurityConfiguration(RSAKeyProperties keys, UserService userService) {
+    public SecurityConfiguration(RSAKeyProperties keys) {
         this.keys = keys;
-        this.userService = userService;
     }
 
     @Bean

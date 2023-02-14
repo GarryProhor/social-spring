@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
-@Configuration
+
 @ConfigurationProperties(prefix="rsa")
 public class RSAKeyProperties {
     private RSAPublicKey publicKey;
