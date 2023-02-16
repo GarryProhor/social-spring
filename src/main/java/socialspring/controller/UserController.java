@@ -2,7 +2,6 @@ package socialspring.controller;
 
 import com.google.common.net.HttpHeaders;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import socialspring.model.ApplicationUser;
 import socialspring.service.UserService;
