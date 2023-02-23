@@ -8,6 +8,7 @@ import socialspring.repository.ImageRepository;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 @Service
 @Transactional
@@ -42,5 +43,20 @@ public class ImageService {
             e.printStackTrace();
             return "file uploaded unsuccessfully";
         }
+    }
+    public byte[] downloadImage(String filename){
+        try {
+            Image image = imageRepository.findByImageName(filename).get();
+            String filePath = image.getImagePath();
+            byte[] imageBytes = Files.readAllBytes(new File(filePath).toPath());
+            return imageBytes;
+        }catch (IOException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public String getImageType(String fileName){
+        Image image = imageRepository.findByImageName(fileName).get();
+        return image.getImageType();
     }
 }

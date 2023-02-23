@@ -2,9 +2,13 @@ package socialspring.controller;
 
 import com.google.common.net.HttpHeaders;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import socialspring.model.ApplicationUser;
 import socialspring.service.UserService;
+import socialspring.service.impl.ImageService;
 import socialspring.service.impl.TokenService;
 
 @RestController
@@ -15,6 +19,7 @@ public class UserController {
 
     private final UserService userService;
     private final TokenService tokenService;
+    private final ImageService imageService;
 
     @GetMapping("/verify")
     public ApplicationUser verifyIdentity(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
@@ -31,5 +36,12 @@ public class UserController {
             user = null;
         }
         return user;
+    }
+
+    @PostMapping("/pfp")
+    public ResponseEntity<String> uploadProfilePicture(@RequestParam("image")MultipartFile file){
+        String uploadImage = imageService.uploadImage(file, "pfp");
+        return ResponseEntity.status(HttpStatus.OK).body(uploadImage);
+
     }
 }
