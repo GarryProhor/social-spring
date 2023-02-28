@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import socialspring.exception.UnableToSavePhotoException;
 import socialspring.model.ApplicationUser;
 import socialspring.service.UserService;
 import socialspring.service.impl.ImageService;
@@ -39,7 +40,7 @@ public class UserController {
     }
 
     @PostMapping("/pfp")
-    public ResponseEntity<String> uploadProfilePicture(@RequestParam("image")MultipartFile file){
+    public ResponseEntity<String> uploadProfilePicture(@RequestParam("image")MultipartFile file) throws UnableToSavePhotoException {
         String uploadImage = imageService.uploadImage(file, "pfp");
         return ResponseEntity.status(HttpStatus.OK).body(uploadImage);
 

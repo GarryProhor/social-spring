@@ -2,11 +2,14 @@ package socialspring.service.impl;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import socialspring.exception.UnableToResolvePhotoException;
+import socialspring.exception.UnableToSavePhotoException;
 import socialspring.model.Image;
 import socialspring.repository.ImageRepository;
 
 import javax.transaction.Transactional;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 
@@ -23,7 +26,7 @@ public class ImageService {
         this.imageRepository = imageRepository;
     }
 
-    public String uploadImage(MultipartFile file, String prefix){
+    public String uploadImage(MultipartFile file, String prefix) throws UnableToSavePhotoException {
         try {
 //            The content type from request looks something like this img/jpeg
             String extension = "." + file.getContentType().split("/")[1];
@@ -40,19 +43,17 @@ public class ImageService {
 
             return "file uploaded successfully: " + img.getName();
         }catch (IOException e){
-            e.printStackTrace();
-            return "file uploaded unsuccessfully";
+            throw new UnableToSavePhotoException();
         }
     }
-    public byte[] downloadImage(String filename){
+    public byte[] downloadImage(String filename) throws UnableToResolvePhotoException {
         try {
             Image image = imageRepository.findByImageName(filename).get();
             String filePath = image.getImagePath();
             byte[] imageBytes = Files.readAllBytes(new File(filePath).toPath());
             return imageBytes;
         }catch (IOException e){
-            e.printStackTrace();
-            return null;
+            throw new UnableToResolvePhotoException();
         }
     }
     public String getImageType(String fileName){
