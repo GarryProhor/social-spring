@@ -9,11 +9,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import socialspring.exception.EmailAlreadyTakenException;
-import socialspring.exception.EmailFailedToSendException;
-import socialspring.exception.IncorrectVerificationCodeException;
-import socialspring.exception.UserDoesNotException;
+import org.springframework.web.multipart.MultipartFile;
+import socialspring.exception.*;
 import socialspring.model.ApplicationUser;
+import socialspring.model.Image;
 import socialspring.model.RegistrationObject;
 import socialspring.model.Role;
 import socialspring.repository.ApplicationUserRepository;
@@ -32,6 +31,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final MailService mailService;
     private final PasswordEncoder passwordEncoder;
+
+    private final ImageService imageService;
 
     @Override
     public ApplicationUser registerUser(RegistrationObject ro) {
@@ -119,6 +120,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.save(user);
     }
 
+    @Override
+    public ApplicationUser setProfileOrBannerPicture(String username, MultipartFile file, String prefix) throws UnableToSavePhotoException {
+       ApplicationUser user = userRepository.findByUserName(username).orElseThrow(UserDoesNotException::new);
+
+        Image photo = imageService.uploadImage(file, prefix);
+
+        if(prefix.equals("pfp")){
+            user.setProfilePicture(photo);
+        }else {
+            user.setBannerPicture(photo);
+        }
+       return userRepository.save(user);
+    }
+
 
     private String generateUserName(String name) {
         long generatedNumber = (long) Math.floor(Math.random() * 1000_000_000);
@@ -143,4 +158,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         UserDetails ud = new User(u.getUserName(), u.getPassword(), authorities);
         return ud;
     }
+
 }

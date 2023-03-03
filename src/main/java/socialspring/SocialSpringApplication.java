@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import socialspring.config.RSAKeyProperties;
 import socialspring.model.ApplicationUser;
 import socialspring.model.Role;
+import socialspring.repository.ApplicationUserRepository;
 import socialspring.repository.RoleRepository;
 import socialspring.repository.UserRepository;
 
@@ -24,7 +25,7 @@ public class SocialSpringApplication {
     }
 
     @Bean
-    CommandLineRunner run(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder encoder) {
+    CommandLineRunner run(RoleRepository roleRepository, ApplicationUserRepository userRepository, PasswordEncoder encoder) {
         return args -> {
             Role r = roleRepository.save(new Role(1L, "USER"));
 
