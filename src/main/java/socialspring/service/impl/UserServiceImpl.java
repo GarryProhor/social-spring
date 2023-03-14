@@ -158,5 +158,43 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         UserDetails ud = new User(u.getUserName(), u.getPassword(), authorities);
         return ud;
     }
+    @Override
+    public Set<ApplicationUser> followUser(String user, String followee){
+        ApplicationUser loggedInUser = userRepository.findByUserName(user).orElseThrow(UserDoesNotException::new);
+
+        Set<ApplicationUser> followingList = loggedInUser.getFollowing();
+
+        ApplicationUser followedUser = userRepository.findByUserName(followee).orElseThrow(UserDoesNotException::new);
+
+        Set<ApplicationUser> followersList = followedUser.getFollowers();
+
+        //Add the followed use to the following list
+        followingList.add(followedUser);
+        loggedInUser.setFollowing(followingList);
+
+        //Add the current user to the follower list of the followee
+        followersList.add(loggedInUser);
+        followedUser.setFollowers(followersList);
+
+        //Update both users
+        userRepository.save(loggedInUser);
+        userRepository.save(followedUser);
+
+        return  loggedInUser.getFollowing();
+    }
+
+    @Override
+    public Set<ApplicationUser> retrieveFollowersList(String username) {
+        ApplicationUser user = userRepository.findByUserName(username).orElseThrow(UserDoesNotException::new);
+
+        return user.getFollowers();
+    }
+
+    @Override
+    public Set<ApplicationUser> retrieveFollowingList(String username) {
+        ApplicationUser user = userRepository.findByUserName(username).orElseThrow(UserDoesNotException::new);
+
+        return user.getFollowing();
+    }
 
 }

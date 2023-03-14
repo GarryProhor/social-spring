@@ -1,10 +1,8 @@
 package socialspring.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
@@ -12,11 +10,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@EqualsAndHashCode
+@ToString
+@Getter
+@Setter
 public class ApplicationUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -62,15 +63,19 @@ public class ApplicationUser {
             inverseJoinColumns = {@JoinColumn(name = "following_id")}
     )
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     Set<ApplicationUser> following;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="followers",
             joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "follower_id")}
+            inverseJoinColumns = {@JoinColumn(name = "followers_id")}
     )
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     Set<ApplicationUser> followers;
 
     /* Security related*/
