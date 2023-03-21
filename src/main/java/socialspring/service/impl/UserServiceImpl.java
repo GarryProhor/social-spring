@@ -20,6 +20,10 @@ import socialspring.repository.RoleRepository;
 import socialspring.service.MailService;
 import socialspring.service.UserService;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -126,11 +130,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         Image photo = imageService.uploadImage(file, prefix);
 
-        if(prefix.equals("pfp")){
-            user.setProfilePicture(photo);
-        }else {
-            user.setBannerPicture(photo);
+        try {
+            if(prefix.equals("pfp")){
+                if(user.getProfilePicture() != null && !user.getProfilePicture().getImageName().equals("defaultpfp.png")){
+                    Path p = Paths.get(user.getProfilePicture().getImagePath());
+                    Files.deleteIfExists(p);
+                }
+                user.setProfilePicture(photo);
+            }else {
+                if(user.getBannerPicture() != null && !user.getBannerPicture().getImageName().equals("defaultbnr.png")){
+                    Path p = Paths.get(user.getBannerPicture().getImagePath());
+                    Files.deleteIfExists(p);
+                }
+                user.setBannerPicture(photo);
+            }
+        }catch (IOException e){
+            throw new UnableToSavePhotoException();
         }
+
        return userRepository.save(user);
     }
 
@@ -159,7 +176,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return ud;
     }
     @Override
-    public Set<ApplicationUser> followUser(String user, String followee){
+    public Set<ApplicationUser> followUser(String user, String followee) throws FollowException{
+
+        if(user.equals(followee)) throw new FollowException();
+
         ApplicationUser loggedInUser = userRepository.findByUserName(user).orElseThrow(UserDoesNotException::new);
 
         Set<ApplicationUser> followingList = loggedInUser.getFollowing();

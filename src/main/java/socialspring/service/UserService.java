@@ -1,6 +1,7 @@
 package socialspring.service;
 
 import org.springframework.web.multipart.MultipartFile;
+import socialspring.exception.FollowException;
 import socialspring.exception.UnableToSavePhotoException;
 import socialspring.model.ApplicationUser;
 import socialspring.model.RegistrationObject;
@@ -21,7 +22,7 @@ public interface UserService {
 
     ApplicationUser setProfileOrBannerPicture(String username, MultipartFile file, String prefix) throws UnableToSavePhotoException;
 
-    Set<ApplicationUser> followUser(String user, String followee);
+    Set<ApplicationUser> followUser(String user, String followee) throws FollowException;
 
     Set<ApplicationUser> retrieveFollowersList(String username);
 
