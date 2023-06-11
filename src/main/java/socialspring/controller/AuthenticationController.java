@@ -1,13 +1,16 @@
 package socialspring.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
+import socialspring.dto.FindUsernameDTO;
 import socialspring.exception.EmailAlreadyTakenException;
 import socialspring.exception.EmailFailedToSendException;
 import socialspring.exception.IncorrectVerificationCodeException;
@@ -127,6 +130,14 @@ public class AuthenticationController {
         }catch (AuthenticationException e){
             return new LoginResponse(null, "");
         }
+    }
+
+    @PostMapping("/find")
+    public ResponseEntity<String> verifyUserName(@RequestBody FindUsernameDTO credential){
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.TEXT_PLAIN);
+        String username = userService.verifyUsername(credential);
+        return new ResponseEntity<>(username, HttpStatus.OK);
     }
 
 }
