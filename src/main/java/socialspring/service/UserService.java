@@ -1,6 +1,7 @@
 package socialspring.service;
 
 import org.springframework.web.multipart.MultipartFile;
+import socialspring.dto.FindUsernameDTO;
 import socialspring.exception.FollowException;
 import socialspring.exception.UnableToSavePhotoException;
 import socialspring.model.ApplicationUser;
@@ -27,4 +28,6 @@ public interface UserService {
     Set<ApplicationUser> retrieveFollowersList(String username);
 
     Set<ApplicationUser> retrieveFollowingList(String username);
+
+    String verifyUsername(FindUsernameDTO credential);
 }

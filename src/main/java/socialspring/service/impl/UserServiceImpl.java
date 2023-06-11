@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import socialspring.dto.FindUsernameDTO;
 import socialspring.exception.*;
 import socialspring.model.ApplicationUser;
 import socialspring.model.Image;
@@ -215,6 +216,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         ApplicationUser user = userRepository.findByUserName(username).orElseThrow(UserDoesNotException::new);
 
         return user.getFollowing();
+    }
+
+    @Override
+    public String verifyUsername(FindUsernameDTO credential) {
+        ApplicationUser user = userRepository.findByEmailOrPhoneOrUserName(credential.getEmail(), credential.getPhone(), credential.getUsername())
+                .orElseThrow(UserDoesNotException::new);
+        return user.getUserName();
     }
 
 }
