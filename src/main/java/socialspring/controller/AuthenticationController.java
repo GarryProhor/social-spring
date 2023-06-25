@@ -11,10 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import socialspring.dto.FindUsernameDTO;
-import socialspring.exception.EmailAlreadyTakenException;
-import socialspring.exception.EmailFailedToSendException;
-import socialspring.exception.IncorrectVerificationCodeException;
-import socialspring.exception.UserDoesNotException;
+import socialspring.exception.*;
 import socialspring.model.ApplicationUser;
 import socialspring.model.LoginResponse;
 import socialspring.model.RegistrationObject;
@@ -116,7 +113,7 @@ public class AuthenticationController {
         return userService.setPassword(userName, password);
     }
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LinkedHashMap<String, String> body){
+    public LoginResponse login(@RequestBody LinkedHashMap<String, String> body) throws InvalidCredentialsException {
         String userName = body.get("userName");
         String password = body.get("password");
 
@@ -128,8 +125,13 @@ public class AuthenticationController {
             String token = tokenService.generateToken(auth);
             return new LoginResponse(userService.getUserByUsername(userName), token);
         }catch (AuthenticationException e){
-            return new LoginResponse(null, "");
+            throw new InvalidCredentialsException();
         }
+    }
+
+    @ExceptionHandler({InvalidCredentialsException.class})
+    public ResponseEntity<String> handleInvalidCredentials(){
+        return new  ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
     }
 
     @PostMapping("/find")
