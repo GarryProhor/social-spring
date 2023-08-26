@@ -225,4 +225,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return user.getUserName();
     }
 
+    @Override
+    public ApplicationUser getUsersEmailAndPhone(FindUsernameDTO credential) {
+        return userRepository.findByEmailOrPhoneOrUserName(credential.getEmail(), credential.getPhone(), credential.getUsername())
+                .orElseThrow(UserDoesNotException::new);
+    }
+
 }

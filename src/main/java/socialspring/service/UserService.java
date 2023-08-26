@@ -30,4 +30,6 @@ public interface UserService {
     Set<ApplicationUser> retrieveFollowingList(String username);
 
     String verifyUsername(FindUsernameDTO credential);
+
+    ApplicationUser getUsersEmailAndPhone(FindUsernameDTO credential);
 }
