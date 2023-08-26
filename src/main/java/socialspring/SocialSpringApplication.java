@@ -38,6 +38,7 @@ public class SocialSpringApplication {
             user.setLastName("prohor");
             user.setEmail("igorprohorchenko@gmail.com");
             user.setUserName("GarryProhor");
+            user.setPhone("5555555555");
             user.setPassword(encoder.encode("password"));
             user.setEnabled(true);
 
