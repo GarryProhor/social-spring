@@ -11,10 +11,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import socialspring.dto.FindUsernameDTO;
+import socialspring.dto.PasswordCodeDTO;
 import socialspring.exception.*;
 import socialspring.model.ApplicationUser;
 import socialspring.model.LoginResponse;
 import socialspring.model.RegistrationObject;
+import socialspring.service.MailService;
 import socialspring.service.UserService;
 import socialspring.service.impl.TokenService;
 
@@ -28,6 +30,7 @@ public class AuthenticationController {
     private final UserService userService;
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
+    private final MailService emailService;
 
     @ExceptionHandler({EmailAlreadyTakenException.class})
     public ResponseEntity<String> handlerEmailTaken() {
@@ -146,6 +149,15 @@ public class AuthenticationController {
     public FindUsernameDTO findIdentifiers(@RequestBody FindUsernameDTO credentials){
         ApplicationUser user = userService.getUsersEmailAndPhone(credentials);
         return new FindUsernameDTO(user.getEmail(), user.getPhone(), user.getUserName());
+    }
+
+    @PostMapping("/password/code")
+    public ResponseEntity<String> retrievePasswordCode(@RequestBody PasswordCodeDTO body) throws Exception {
+        String email = body.getEmail();
+        int code = body.getCode();
+                    emailService.sendEmail(email, "Your password reset code", ""+code);
+
+        return new ResponseEntity<String>("Code sent successfully", HttpStatus.OK);
     }
 
 }
