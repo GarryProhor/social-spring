@@ -142,4 +142,10 @@ public class AuthenticationController {
         return new ResponseEntity<>(username, HttpStatus.OK);
     }
 
+    @PostMapping("/identifiers")
+    public FindUsernameDTO findIdentifiers(@RequestBody FindUsernameDTO credentials){
+        ApplicationUser user = userService.getUsersEmailAndPhone(credentials);
+        return new FindUsernameDTO(user.getEmail(), user.getPhone(), user.getUserName());
+    }
+
 }
